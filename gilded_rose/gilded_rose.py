@@ -36,6 +36,14 @@ class GildedRose(object):
         if item.quality < 50:
             self.adjust_quality(item, 1)
 
+    def handle_other(self, item):
+        if item.quality > 0:
+            self.adjust_quality(item, -1)
+
+        self.decrement_sell_in(item)
+        if item.sell_in < 0 and item.quality > 0:
+            self.adjust_quality(item, -1)
+
     def update_quality(self):
         for item in self.items:
             if item.name == self.backstage_pass:
@@ -45,9 +53,4 @@ class GildedRose(object):
             elif item.name == self.sulfuras:
                 self.handle_sulfuras(item)
             else:
-                if item.quality > 0:
-                    self.adjust_quality(item, -1)
-                
-                self.decrement_sell_in(item)
-                if item.sell_in < 0 and item.quality > 0:
-                    self.adjust_quality(item, -1)
+                self.handle_other(item)
