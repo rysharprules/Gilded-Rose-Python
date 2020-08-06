@@ -13,35 +13,44 @@ class GildedRose(object):
     def decrement_sell_in(self, item):
         item.sell_in = item.sell_in - 1
 
+    def is_quality_below_upper_threshold(self, item):
+        return item.quality < 50
+
+    def is_quality_above_lower_threshold(self, item):
+        return item.quality > 0
+
+    def is_past_sell_in_date(self, item, date):
+        return item.sell_in < date
+
     def handle_backstage_pass(self, item):
-        if item.quality < 50:
+        if self.is_quality_below_upper_threshold(item):
             self.adjust_quality(item, 1)
-        if item.sell_in < 11 and item.quality < 50:
+        if self.is_past_sell_in_date(item, 11) and self.is_quality_below_upper_threshold(item):
             self.adjust_quality(item, 1)
-        if item.sell_in < 6 and item.quality < 50:
+        if self.is_past_sell_in_date(item, 6) and self.is_quality_below_upper_threshold(item):
             self.adjust_quality(item, 1)
 
         self.decrement_sell_in(item)
-        if item.sell_in < 0:
+        if self.is_past_sell_in_date(item, 0):
             self.adjust_quality(item, -item.quality)
 
     def handle_aged_brie(self, item):
-        if item.quality < 50:
+        if self.is_quality_below_upper_threshold(item):
             self.adjust_quality(item, 1)
         self.decrement_sell_in(item)
-        if item.sell_in < 0 and item.quality < 50:
+        if self.is_past_sell_in_date(item, 0) and self.is_quality_below_upper_threshold(item):
             self.adjust_quality(item, 1)
 
     def handle_sulfuras(self, item):
-        if item.quality < 50:
+        if self.is_quality_below_upper_threshold(item):
             self.adjust_quality(item, 1)
 
     def handle_other(self, item):
-        if item.quality > 0:
+        if self.is_quality_above_lower_threshold(item):
             self.adjust_quality(item, -1)
 
         self.decrement_sell_in(item)
-        if item.sell_in < 0 and item.quality > 0:
+        if self.is_past_sell_in_date(item, 0) and self.is_quality_above_lower_threshold(item):
             self.adjust_quality(item, -1)
 
     def update_quality(self):
