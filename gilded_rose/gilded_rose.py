@@ -3,6 +3,7 @@ class GildedRose(object):
     backstage_pass = "Backstage passes to a TAFKAL80ETC concert"
     aged_brie = "Aged Brie"
     sulfuras = "Sulfuras, Hand of Ragnaros"
+    conjured = "Conjured"
 
     def __init__(self, items):
         self.items = items
@@ -45,6 +46,15 @@ class GildedRose(object):
         if self.is_quality_below_upper_threshold(item):
             self.adjust_quality(item, 1)
 
+    def handle_conjured(self, item):
+        if self.is_quality_above_lower_threshold(item):
+            self.adjust_quality(item, -2)
+
+        self.decrement_sell_in(item)
+        if self.is_past_sell_in_date(item, 0) and self.is_quality_above_lower_threshold(item):
+            self.adjust_quality(item, -2)
+
+
     def handle_other(self, item):
         if self.is_quality_above_lower_threshold(item):
             self.adjust_quality(item, -1)
@@ -61,5 +71,7 @@ class GildedRose(object):
                 self.handle_aged_brie(item)
             elif item.name == self.sulfuras:
                 self.handle_sulfuras(item)
+            elif item.name.startswith(self.conjured):
+                self.handle_conjured(item)
             else:
                 self.handle_other(item)
